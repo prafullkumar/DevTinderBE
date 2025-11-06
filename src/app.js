@@ -2,29 +2,25 @@ const express = require("express");
 const connectDB = require("./config/database");
 const User = require("./models/user");
 const app = express();
-
+const { validateSignUpData } = require("./utils/validation");
+const bcrypt = require("bcrypt");
+const validator = require("validator");
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
   // Signup logic here
-
-  const signUpdata = req.body;
   try {
-    if (
-      signUpdata.firstName.length < 4 ||
-      signUpdata.firstName.length > 30 ||
-      !signUpdata.firstName ||
-      typeof signUpdata.firstName !== "string" ||
-      /^\s*$/.test(signUpdata.firstName) ||
-      !/^[A-Za-z\s]+$/.test(signUpdata.firstName)
-    ) {
-      return res
-        .status(400)
-        .send(
-          "Invalid first name. Only letters and spaces allowed, 4–30 characters."
-        );
-    }
-    const userData = new User(signUpdata);
+    validateSignUpData(req);
+    const { firstName, lastName, email, password, gender } = req.body;
+    const enncryptpass = await bcrypt.hash(password, 10);
+
+    const userData = new User({
+      firstName,
+      lastName,
+      email,
+      gender,
+      password: enncryptpass,
+    });
     await userData.save();
     res.send("User Data added successfully!!");
   } catch (error) {
@@ -110,6 +106,29 @@ app.patch("/user/:userID", async (req, res) => {
     res.send("User updated successfully");
   } catch (error) {
     res.status(500).send("Error updating user " + error.message);
+  }
+});
+
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    if (!validator.isEmail(email)) {
+      throw new Error("Invalid Email Id !");
+    }
+    const userData = await User.findOne({ email });
+
+    if (!userData) {
+      throw new Error("Invalid Credential");
+    }
+    const isvalidPassword = await bcrypt.compare(password, userData.password);
+
+    if (isvalidPassword) {
+      res.send("Login Successfully!");
+    } else {
+      throw new Error("Invalid Credential");
+    }
+  } catch (err) {
+    res.status(400).send("ERROR " + err.message);
   }
 });
 
