@@ -93,7 +93,7 @@ userRouter.get("/feed", userAuth, async (req, res) => {
         { _id: { $nin: Array.from(hiddenUserIds) } },
       ],
     })
-      .select(" firstName lastName skills photo")
+      .select(" firstName lastName skills photo age gender email about")
       .skip(skip)
       .limit(limit);
 

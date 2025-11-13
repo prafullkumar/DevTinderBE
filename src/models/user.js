@@ -80,6 +80,10 @@ const user = new mongoose.Schema(
         }
       },
     },
+    about: {
+      type: String,
+      maxlength: 500,
+    },
   },
 
   { timestamps: true }

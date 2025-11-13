@@ -23,10 +23,20 @@ const validateSignUpData = (req) => {
   }
 };
 const validateProfileData = (req) => {
-  const { firstName, lastName, address, gender, photo, skills } = req.body;
+  const { firstName, lastName, address, gender, photo, skills, age, about } =
+    req.body;
 
   // 🧩 Required fields check
-  if (!firstName || !lastName || !address || !gender || !photo || !skills) {
+  if (
+    !firstName ||
+    !lastName ||
+    !address ||
+    !gender ||
+    !photo ||
+    !skills ||
+    !age ||
+    !about
+  ) {
     throw new Error("All fields are required");
   }
 
@@ -84,6 +94,8 @@ const validateProfileData = (req) => {
     "gender",
     "photo",
     "skills",
+    "age",
+    "about",
   ];
   const isValidData = Object.keys(req.body).every((field) =>
     ALLOWED_UPDATES.includes(field)
