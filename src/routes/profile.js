@@ -22,7 +22,6 @@ profileRouter.patch("/edit", userAuth, async (req, res) => {
     const isvalidData = validateProfileData(req);
     if (isvalidData) {
       Object.keys(req.body).forEach((key) => {
-        console.log(key);
         loggedInUser[key] = req.body[key];
       });
 
